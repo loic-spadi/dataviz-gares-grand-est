@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Grand Est Ferroviaire — Géovisualisation</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/@turf/turf@6/turf.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700&family=Barlow:wght@400&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --noir: #0f0e0d; --acier: #2e2b27; --rouge-fonce: #7b241c; 
+            --rouge-clair: #ec7063; --or: #d4a843; --blanc: #fafaf8; --violet: #4a235a;
+            --cyan: #00fbff;
+        }
+        body { background: var(--noir); color: var(--blanc); font-family: 'Barlow', sans-serif; margin: 0; overflow: hidden; }
+        
+        /* Header et Controls */
+        header { 
+            height: 15vh; 
+            background: var(--acier); 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            padding: 0 20px;
+            border-bottom: 2px solid var(--rouge-fonce);
+        }
+        .header-top { display: flex; justify-content: space-between; align-items: center; }
+        .controls { margin-top: 10px; }
+        
+        h1 { font-family: 'Barlow Condensed'; color: var(--or); text-transform: uppercase; margin: 0; font-size: 1.8rem; }
+        select { 
+            background: var(--noir); color: var(--or); border: 1px solid var(--or); 
+            padding: 5px 15px; font-family: 'Barlow'; cursor: pointer; 
+        }
+
+        #map { width: 100%; height: 85vh; background: var(--noir); }
+        
+        /* Styles Popups */
+        .leaflet-popup-content-wrapper { background: var(--acier); color: var(--blanc); border-radius: 0; border: 1px solid var(--or); font-family: 'Barlow'; }
+        .popup-img { width: 100%; height: 120px; object-fit: cover; margin-bottom: 8px; border-bottom: 1px solid var(--or); }
+        .evol-pos { color: #2ecc71; font-weight: bold; }
+        .evol-neg { color: #e74c3c; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="header-top">
+        <h1>Exploration du Réseau Grand Est</h1>
+        <a href="accueil-contexte-infographie.html" style="color:var(--blanc); text-decoration:none; font-weight:bold;">← Retour</a>
+    </div>
+    <div class="controls">
+        <select id="dep-select" onchange="zoomToDep()">
+            <option value="">Zoomer sur un département...</option>
+            <option value="Ardennes">08 - Ardennes</option>
+            <option value="Aube">10 - Aube</option>
+            <option value="Marne">51 - Marne</option>
+            <option value="Haute-Marne">52 - Haute-Marne</option>
+            <option value="Meurthe-et-Moselle">54 - Meurthe-et-Moselle</option>
+            <option value="Meuse">55 - Meuse</option>
+            <option value="Moselle">57 - Moselle</option>
+            <option value="Bas-Rhin">67 - Bas-Rhin</option>
+            <option value="Haut-Rhin">68 - Haut-Rhin</option>
+            <option value="Vosges">88 - Vosges</option>
+        </select>
+    </div>
+</header>
+
+<div id="map"></div>
+
+<script>
+    const map = L.map('map').setView([48.6, 7.5], 7);
+
+    // Fond de carte Dark
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; CARTO'
+    }).addTo(map);
+
+    let bufferLayer = L.layerGroup().addTo(map);
+    let garesLayer, depsLayer;
+    let highlightedGares = [];
+    
+        // Création d'un panneau pour les gares
+    map.createPane('garesPane');
+    map.getPane('garesPane').style.zIndex = 650;
+    map.getPane('garesPane');
+    
+    map.createPane('lignesPane');
+    map.getPane('lignesPane').style.zIndex = 400;
+
+    // 1. STYLE DES GARES (Graduation Rouge)
+    function getGareStyle(freqStr) {
+        const freq = parseInt(freqStr);
+        let color = freq > 1000000 ? '#7b241c' : 
+                    freq > 500000  ? '#943126' :
+                    freq > 100000  ? '#ba4a3f' : '#ec7063';
+        return { radius: 5, fillColor: color, color: "#000", weight: 1, opacity: 1, fillOpacity: 0.9 };
+    }
+
+    function resetGaresStyle() {
+        highlightedGares.forEach(layer => {
+            layer.setStyle(getGareStyle(layer.feature.properties.tot_2024));
+        });
+        highlightedGares = [];
+    }
+
+    // 2. CHARGEMENT DÉPARTEMENTS
+    fetch('data/region_grand_est_4326.geojson').then(res => res.json()).then(data => {
+        depsLayer = L.geoJSON(data, {
+            style: { color: 'var(--or)', weight: 1, fillOpacity: 0.03, interactive: false }
+        }).addTo(map);
+    });
+
+    // 4. CHARGEMENT DES GARES
+    fetch('data/gares_grand_est_4326.geojson').then(res => res.json()).then(data => {
+        garesLayer = L.geoJSON(data, {
+            pointToLayer: (feature, latlng) => L.circleMarker(latlng, getGareStyle(feature.properties.tot_2024)), pane: 'garesPane',
+            onEachFeature: (feature, layer) => {
+                const p = feature.properties;
+                const evol = parseFloat(p.tot_evol_1);
+                const evolClass = evol >= 0 ? 'evol-pos' : 'evol-neg';
+                // Chemin image relatif : images/nom_du_fichier.jpg (à adapter si besoin)
+                const imgBase = `images/${p.Nom
+                    .toLowerCase()
+                    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+                    .replace(/['\u2019]/g, "")
+                    .replace(/\s+/g, '_')
+                    .replace(/[^a-z0-9_]/g, '')}`;
+
+                const imgTag = `<img src="${imgBase}.jpg" class="popup-img"
+                onerror="if(this.src.endsWith('.jpg')){this.src=this.src.replace('.jpg','.png')}else{this.style.display='none'}">`;
+
+                layer.bindPopup(`
+                    ${imgTag}
+                    <b style="color:var(--or); font-size:1.1rem;">${p.Nom}</b><br>
+                    Ouverture : ${p.annee_ouv}<br>
+                    Fréquentation 2024 : <b>${parseInt(p.tot_2024).toLocaleString()}</b><br>
+                    Évolution (2015-24) : <span class="${evolClass}">${evol}%</span>
+                    `);
+            }
+        }).addTo(map);
+    });
+
+    // 3. CHARGEMENT DES LIGNES + BUFFER
+    fetch('data/lignes_grand_est_4326.geojson').then(res => res.json()).then(data => {
+        L.geoJSON(data, {
+            style: { color: "#4a235a", weight: 3, opacity: 0.7, pane: 'lignesPane' },
+            onEachFeature: (feature, layer) => {
+                layer.on('click', function(e) {
+                    bufferLayer.clearLayers();
+                    resetGaresStyle();
+
+                    // Calcul Buffer 200m
+                    let buffered = turf.buffer(feature, 0.2, {units: 'kilometers'});
+                    L.geoJSON(buffered, {style: {color: 'var(--cyan)', fillOpacity: 0.1, weight: 1}}).addTo(bufferLayer);
+
+                    // Surlignage gares
+                    garesLayer.eachLayer(gare => {
+                        if (turf.booleanPointInPolygon(gare.toGeoJSON(), buffered)) {
+                            gare.setStyle({ fillColor: 'var(--cyan)', color: '#fff', weight: 2, radius: 7 });
+                            highlightedGares.push(gare);
+                        }
+                    });
+
+                    layer.bindPopup(`
+                        <b style="color:var(--or)">Ligne N°${feature.properties.CODE_LIGNE}</b><br>
+                        ${feature.properties.NOM}<br>
+                        Ouverture : ${feature.properties.date_ouv_f}
+                    `).openPopup();
+                });
+            }
+        }).addTo(map);
+    });
+
+    // 5. FONCTION ZOOM
+    function zoomToDep() {
+        const val = document.getElementById('dep-select').value;
+        if (!val || !depsLayer) return;
+        depsLayer.eachLayer(layer => {
+            if (layer.feature.properties.DDEP_L_LIB === val) {
+                map.fitBounds(layer.getBounds());
+            }
+        });
+    }
+</script>
+</body>
+</html>

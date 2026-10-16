@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Grand Est Ferroviaire — Contexte & Infographie</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;600;700;900&family=Barlow:wght@300;400;500&family=Barlow+Semi+Condensed:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --noir:       #0f0e0d;
+      --charbon:    #1c1a18;
+      --acier:      #2e2b27;
+      --rouge:      #c0392b;
+      --or:         #d4a843;
+      --sable:      #e8dfc8;
+      --creme:      #f5f0e8;
+      --blanc:      #fafaf8;
+      --gris:       #8a8478;
+      --gris-clair: #b8b0a0;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--charbon);
+      color: var(--creme);
+      font-family: 'Barlow', sans-serif;
+      font-weight: 300;
+      line-height: 1.75;
+      overflow-x: hidden;
+      font-size: 17px;
+    }
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: repeating-linear-gradient(90deg, transparent, transparent 59px, rgba(255,255,255,0.012) 59px, rgba(255,255,255,0.012) 60px);
+      pointer-events: none; z-index: 0;
+    }
+
+    /* ─── NAV ─── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      background: rgba(15,14,13,0.93);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(212,168,67,0.2);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 3.5rem; height: 62px;
+    }
+    .nav-logo {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700; font-size: 1.4rem;
+      letter-spacing: 0.12em; text-transform: uppercase; color: var(--or);
+    }
+    .nav-logo span { color: var(--gris-clair); font-weight: 300; }
+    .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+    .nav-links a {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 400; font-size: 1.1rem;
+      letter-spacing: 0.15em; text-transform: uppercase;
+      color: var(--gris-clair); text-decoration: none;
+      transition: color 0.2s; position: relative;
+    }
+    .nav-links a.active, .nav-links a:hover { color: var(--or); }
+    .nav-links a.active::after {
+      content: ''; position: absolute;
+      bottom: -4px; left: 0; right: 0;
+      height: 1px; background: var(--or);
+    }
+
+    /* ─── HERO ─── */
+    .hero {
+      position: relative; min-height: 100vh;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 80px 3rem 5rem; overflow: hidden; text-align: center;
+    }
+    .hero-bg {
+      position: absolute; inset: 0;
+      background:
+        linear-gradient(180deg, rgba(15,14,13,0.3) 0%, rgba(15,14,13,0.72) 65%, rgba(15,14,13,0.97) 100%),
+        url('site_images/background_image.png') center/cover no-repeat;
+    }
+
+    /* Cadre doré angles */
+    .hero-frame {
+      position: relative;
+      display: inline-block;
+      padding: 2.8rem 4rem 2.4rem;
+      margin-bottom: 2rem;
+    }
+    .hero-frame::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 40px; height: 40px;
+      border-top: 2px solid var(--or);
+      border-left: 2px solid var(--or);
+    }
+    .hero-frame::after {
+      content: '';
+      position: absolute;
+      bottom: 0; right: 0;
+      width: 40px; height: 40px;
+      border-bottom: 2px solid var(--or);
+      border-right: 2px solid var(--or);
+    }
+
+    .hero-title {
+      position: relative;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900;
+      font-size: clamp(3.8rem, 9vw, 7.5rem);
+      line-height: 0.92;
+      text-transform: uppercase;
+      letter-spacing: -0.01em;
+      color: var(--blanc);
+    }
+    .hero-title em { font-style: normal; color: var(--or); }
+
+    .hero-separator {
+      position: relative;
+      width: 90px; height: 1px;
+      background: rgba(212,168,67,0.5);
+      margin: 0 auto 1.8rem;
+    }
+
+    .hero-tag { position: relative; }
+    .hero-tag-sub {
+      font-family: 'Barlow', sans-serif;
+      font-size: 1.08rem; font-weight: 300;
+      color: var(--gris-clair); line-height: 1.6;
+      margin-bottom: 0.45rem; font-style: italic;
+    }
+    .hero-tag-author {
+      font-family: 'Barlow Semi Condensed', sans-serif;
+      font-size: 0.95rem; font-weight: 500;
+      color: var(--sable); letter-spacing: 0.06em; margin-bottom: 0.25rem
+    }
+
+    /* Rail SVG décoratif */
+    .hero-rail {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      height: 38px; overflow: hidden; opacity: 0.32;
+    }
+
+    /* ─── SECTIONS ─── */
+    section { position: relative; z-index: 1; padding: 5.5rem 3.5rem; }
+
+    .section-header {
+      display: flex; align-items: baseline; gap: 1.5rem; margin-bottom: 4rem;
+    }
+    .section-num {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900; font-size: 4.5rem;
+      color: rgba(212,168,67,0.4); line-height: 1; flex-shrink: 0;
+    }
+    .section-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700; font-size: 2rem;
+      text-transform: uppercase; letter-spacing: 0.08em; color: var(--sable);
+    }
+    .section-line {
+      flex: 1; height: 1px;
+      background: linear-gradient(to right, rgba(212,168,67,0.4), transparent);
+      margin-left: 1rem;
+    }
+
+    /* ─── CONTEXTE ─── */
+    #contexte { 
+       background-image:linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)), 
+           url('site_images/background_context.jpg');
+       background-attachment: fixed;
+       background-position:center;
+       background-repeat: no-repeat;
+       background-size: cover;
+    }
+
+    .context-layout {
+      display: grid;
+      grid-template-columns: 1.6fr 1fr;
+      gap: 5rem; align-items: start;
+    }
+
+    .timeline { position: relative; padding-left: 2.5rem; }
+    .timeline::before {
+      content: ''; position: absolute;
+      left: 0; top: 0; bottom: 0; width: 2px;
+      background: linear-gradient(to bottom, var(--or), rgba(212,168,67,0.05));
+    }
+    .timeline-item {
+      position: relative; margin-bottom: 3.5rem; padding-left: 2rem;
+      opacity: 0; transform: translateX(-20px);
+      transition: opacity 0.65s, transform 0.65s;
+    }
+    .timeline-item.visible { opacity: 1; transform: translateX(0); }
+    .timeline-item::before {
+      content: ''; position: absolute;
+      left: -2.7rem; top: 0.45rem;
+      width: 12px; height: 12px; border-radius: 50%;
+      background: var(--or); border: 2px solid var(--noir);
+      box-shadow: 0 0 0 3px rgba(212,168,67,0.22);
+    }
+    .timeline-era {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700; font-size: 1.3rem;
+      letter-spacing: 0.28em; text-transform: uppercase;
+      color: var(--or); margin-bottom: 0.45rem;
+    }
+    .timeline-heading {
+      font-family: 'Barlow Semi Condensed', sans-serif;
+      font-weight: 600; font-size: 1.25rem;
+      color: var(--blanc); margin-bottom: 0.65rem;
+    }
+    .timeline-text {
+      font-size: 1rem; color: var(--gris-clair);
+      max-width: 680px; line-height: 1.8;
+    }
+
+    /* Chiffres clés */
+
+    .key-figures {
+      gap: 1.5rem;
+      margin-top: 0.5rem;
+    }
+    .key-fig-card {
+      background: var(--acier);
+      border: 1px solid rgba(212,168,67,0.15);
+      border-radius: 2px;
+      padding: 1.3rem 1rem;
+      width: 100%; margin-bottom: 10rem;
+      position:relative;
+      overflow:hidden
+    }
+    .key-fig-card::before {
+      content: ''; position: absolute;
+      top: 0; left: 0; width: 3px; height: 100%;
+      background: var(--or);
+    }
+    .key-fig-number {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700; font-size: 2rem;
+      color: var(--or); line-height: 1; margin-bottom: 0.3rem;
+    }
+    .key-fig-label {
+      font-size: 1rem; color: var(--gris-clair); line-height: 1.45;
+    }
+
+    /* ─── INFOGRAPHIE ─── */
+    #infographie {
+       background-image:linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)),
+        url('site_images/background_infographie.png');
+       background-attachment: fixed;
+       background-position:center;
+       background-repeat: no-repeat;
+       background-size: cover;
+    }
+
+    .infog-intro {
+      font-size: 1.05rem; color: var(--gris-clair);
+      max-width: 700px; margin-bottom: 3.5rem; line-height: 1.8;
+    }
+
+    .toggle-group {
+      display: flex; gap: 0;
+      border: 1px solid rgba(212,168,67,0.3);
+      border-radius: 2px; width: fit-content;
+    }
+    .toggle-btn {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 600; font-size: 0.82rem;
+      letter-spacing: 0.16em; text-transform: uppercase;
+      padding: 0.65rem 1.8rem; border: none;
+      background: transparent; color: var(--gris-clair);
+      cursor: pointer; transition: all 0.2s;
+    }
+    .toggle-btn:first-child { border-right: 1px solid rgba(212,168,67,0.3); }
+    .toggle-btn.active { background: var(--or); color: var(--noir); }
+
+    /* Barchart */
+    .chart-container {
+      background: var(--acier);
+      border: 1px solid rgba(255,255,255,0.07);
+      padding: 2.2rem 2.2rem 1.8rem;
+      border-radius: 2px; margin-bottom: 2.8rem;
+    }
+    .chart-top-row {
+      display: flex; justify-content: space-between;
+      align-items: center; flex-wrap: wrap;
+      gap: 1rem; margin-bottom: 1.8rem;
+    }
+    .chart-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 600; font-size: 1.2rem;
+      letter-spacing: 0.2em; text-transform: uppercase; color: var(--or);
+    }
+    .bar-row {
+      display: flex; align-items: center;
+      gap: 1rem; margin-bottom: 0.9rem;
+    }
+    .bar-rank {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.82rem; color: var(--gris);
+      width: 24px; text-align: right; flex-shrink: 0;
+    }
+    .bar-label {
+      font-family: 'Barlow Semi Condensed', sans-serif;
+      font-size: 0.97rem; font-weight: 500; color: var(--creme);
+      width: 195px; flex-shrink: 0;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .bar-track {
+      flex: 1; height: 26px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 1px; overflow: hidden;
+    }
+    .bar-fill {
+      height: 100%; border-radius: 1px;
+      transition: width 0.85s cubic-bezier(0.16,1,0.3,1);
+    }
+    .bar-fill-top    { background: linear-gradient(90deg, #1a6e4a, #27ae72); }
+    .bar-fill-bottom { background: linear-gradient(90deg, #5a2010, #8b3a1a); }
+    .bar-value {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.9rem; font-weight: 600; color: var(--gris-clair);
+      width: 120px; text-align: right; flex-shrink: 0;
+    }
+
+    /* Graphique évolution */
+    .evol-wrapper {
+      background: var(--acier);
+      border: 1px solid rgba(255,255,255,0.07);
+      padding: 2.2rem 2.2rem 1.5rem;
+      border-radius: 2px; margin-bottom: 2.8rem;
+    }
+    .evol-header {
+      display: flex; justify-content: space-between;
+      align-items: flex-start; flex-wrap: wrap;
+      gap: 1rem; margin-bottom: 1.5rem;
+    }
+    .evol-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 600; font-size: 1.2rem;
+      letter-spacing: 0.2em; text-transform: uppercase; color: var(--or);
+    }
+    .dept-select {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.88rem; letter-spacing: 0.1em; text-transform: uppercase;
+      background: var(--charbon); color: var(--creme);
+      border: 1px solid rgba(212,168,67,0.3);
+      border-radius: 2px; padding: 0.4rem 0.9rem;
+      cursor: pointer; outline: none;
+    }
+    .dept-select option { background: var(--charbon); }
+
+    #chart-canvas { max-width: 105%; height: 300px; display:block}
+
+    .covid-annotation {
+      margin-top: 1.2rem; display: flex; align-items: flex-start;
+      gap: 0.8rem; padding: 0.9rem 1.1rem;
+      background: rgba(192,57,43,0.08);
+      border-left: 2px solid var(--rouge); border-radius: 1px;
+    }
+    .covid-text { font-size: 0.97rem; color: var(--gris-clair); line-height: 1.6; }
+    .covid-text strong { color: #e74c3c; font-weight: 500; }
+
+    /* Ancienneté 2 colonnes */
+    .anciennete-wrapper {
+      background: var(--acier);
+      border: 1px solid rgba(255,255,255,0.07);
+      padding: 2.2rem 2.2rem 1.8rem;
+      border-radius: 2px;
+    }
+    .anciennete-header {
+      display: flex; justify-content: space-between;
+      align-items: center; flex-wrap: wrap;
+      gap: 1rem; margin-bottom: 1.8rem;
+    }
+    .anc-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 600; font-size: 1.2rem;
+      letter-spacing: 0.2em; text-transform: uppercase; color: var(--or);
+    }
+    .anc-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
+    .anc-list { list-style: none; }
+    .anc-item {
+      display: flex; align-items: baseline; gap: 0.7rem;
+      padding: 0.6rem 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      opacity: 0; transform: translateY(8px);
+      transition: opacity 0.35s, transform 0.35s;
+    }
+    .anc-item.visible { opacity: 1; transform: translateY(0); }
+    .anc-num {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700; font-size: 1.05rem;
+      color: var(--or); flex-shrink: 0; width: 26px;
+    }
+    .anc-name { font-size: 1rem; color: var(--creme); flex: 1; }
+    .anc-year {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.92rem; flex-shrink: 0;
+    }
+
+    /* Animations */
+    .fade-up {
+      opacity: 0; transform: translateY(24px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .fade-up.visible { opacity: 1; transform: translateY(0); }
+
+    /* Footer */
+    footer {
+      background: var(--noir);
+      border-top: 1px solid rgba(212,168,67,0.15);
+      padding: 2.2rem 3.5rem; text-align: center;
+      font-size: 0.85rem; color: var(--gris); letter-spacing: 0.06em;
+    }
+
+    @media (max-width: 960px) {
+      nav { padding: 0 1.5rem; }
+      section { padding: 3.5rem 1.5rem; }
+      .hero { padding: 80px 1.5rem 3rem; }
+      .context-layout { grid-template-columns: 1fr; gap: 3rem; }
+      .anc-cols { grid-template-columns: 1fr; }
+      .hero-frame { padding: 2rem 2rem 1.8rem; }
+      .bar-label { width: 130px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">Le rail en Grand Est</div>
+  <ul class="nav-links">
+    <li><a href="accueil-contexte-infographie.html" class="active">Contexte</a></li>
+    <li><a href="datavisualisation.html">Dataviz</a></li>
+    <li><a href="geovisualisation.html">Carte</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="hero-bg"></div>
+
+  <div class="hero-frame">
+    <h1 class="hero-title">Le Rail<br>en <em>Grand Est</em></h1>
+  </div>
+
+  <div class="hero-separator"></div>
+
+  <div class="hero-tag">
+    <p class="hero-tag-sub">Histoire, fréquentation et enjeux du réseau ferroviaire régional</p>
+    <p class="hero-tag-author">Loïc Spadi &mdash; Master 1 Observation de la Terre et Géomatique</p>
+    <p class="hero-tag-author">Faculté de Géographie et d'Aménagement - Université de Strasbourg</p>
+  </div>
+
+  <!-- Rail SVG -->
+  <div class="hero-rail">
+    <svg viewBox="0 0 1200 38" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="0" y="7"  width="1200" height="5" fill="#d4a843"/>
+      <rect x="0" y="26" width="1200" height="5" fill="#d4a843"/>
+      <g fill="#b8a080">
+        <rect x="18"  y="4" width="14" height="30" rx="1"/>
+        <rect x="63"  y="4" width="14" height="30" rx="1"/>
+        <rect x="108" y="4" width="14" height="30" rx="1"/>
+        <rect x="153" y="4" width="14" height="30" rx="1"/>
+        <rect x="198" y="4" width="14" height="30" rx="1"/>
+        <rect x="243" y="4" width="14" height="30" rx="1"/>
+        <rect x="288" y="4" width="14" height="30" rx="1"/>
+        <rect x="333" y="4" width="14" height="30" rx="1"/>
+        <rect x="378" y="4" width="14" height="30" rx="1"/>
+        <rect x="423" y="4" width="14" height="30" rx="1"/>
+        <rect x="468" y="4" width="14" height="30" rx="1"/>
+        <rect x="513" y="4" width="14" height="30" rx="1"/>
+        <rect x="558" y="4" width="14" height="30" rx="1"/>
+        <rect x="603" y="4" width="14" height="30" rx="1"/>
+        <rect x="648" y="4" width="14" height="30" rx="1"/>
+        <rect x="693" y="4" width="14" height="30" rx="1"/>
+        <rect x="738" y="4" width="14" height="30" rx="1"/>
+        <rect x="783" y="4" width="14" height="30" rx="1"/>
+        <rect x="828" y="4" width="14" height="30" rx="1"/>
+        <rect x="873" y="4" width="14" height="30" rx="1"/>
+        <rect x="918" y="4" width="14" height="30" rx="1"/>
+        <rect x="963" y="4" width="14" height="30" rx="1"/>
+        <rect x="1008" y="4" width="14" height="30" rx="1"/>
+        <rect x="1053" y="4" width="14" height="30" rx="1"/>
+        <rect x="1098" y="4" width="14" height="30" rx="1"/>
+        <rect x="1143" y="4" width="14" height="30" rx="1"/>
+      </g>
+    </svg>
+  </div>
+</header>
+
+<!-- CONTEXTE HISTORIQUE -->
+<section id="contexte">
+  <div class="section-header fade-up">
+    <div class="section-num">01</div>
+    <h2 class="section-title">Contexte historique</h2>
+    <div class="section-line"></div>
+  </div>
+
+  <div class="context-layout">
+    <div class="timeline">
+      <div class="timeline-item">
+        <div class="timeline-era">1840 – 1914</div>
+        <div class="timeline-heading">L'essor industriel du rail</div>
+        <div class="timeline-text">
+          La région Grand Est est parmi les premières à se doter d'un réseau ferroviaire dense, portée par
+          son industrie textile, sidérurgique et minière. Les grandes gares de Strasbourg, Metz et Reims
+          deviennent des nœuds stratégiques reliant Paris à l'Europe centrale. Ce maillage dessert également les territoires ruraux : petites villes, villages industriels et zones d'extraction
+          bénéficient de liaisons régulières qui transforment profondément les modes de vie.
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-era">1918 – 1945</div>
+        <div class="timeline-heading">Le rail dans les conflits</div>
+        <div class="timeline-text">
+          Les deux guerres mondiales impriment leur marque sur le réseau : destructions massives, reconstructions
+          successives, changements de frontières. Le réseau alsacien-mosellan, tantôt français tantôt allemand,
+          connaît des évolutions de tracé et de gabarit selon les enjeux stratégiques et militaires de chaque
+          époque. La reconstruction d'après-guerre modernise partiellement les infrastructures mais la
+          concurrence avec la route devient de plus en plus inévitable.</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-era">1945 – 1985</div>
+        <div class="timeline-heading">Le temps de la voiture et du déclin</div>
+        <div class="timeline-text">
+          L'essor de l'automobile et la désindustrialisation provoquent la fermeture progressive de nombreuses
+          lignes secondaires. Des dizaines de petites gares rurales perdent leur service voyageurs, redessinant
+          la carte des mobilités régionales. Entre 1950 et 1985, la France ferme plus de 15 000 km de voies
+          ferrées — le Grand Est n'est pas épargné. Le monopole de la voiture individuelle remodèle l'urbanisme
+          et le train se devient inefficace sur les courtes distances.
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-era">1981 – 2010</div>
+        <div class="timeline-heading">L'ère TGV et le renouveau grande vitesse</div>
+        <div class="timeline-text">Cependant, le train n'a pas cessé de fonctionner intégralement. Dès les années 1980, les premiers TGV arrivent sur le réseau français, et les technologies ferroviaires se modernisent.&nbsp; La mise en service de la LGV Est Européenne, 25 ans après, relie Strasbourg à Paris en moins de 2h20,
+          redonnant au fer une nouvelle place dans les mobilités. Ce succès commercial de grande ampleur relance l'intérêt politique
+          pour le ferroviaire. De nouvelles gares TGV voient le jour en milieu périurbain, tels que Lorraine TGV,
+          Champagne-Ardenne TGV, redessinant les stratégies d'aménagement du territoire régional.</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-era">2010 – Aujourd'hui</div>
+        <div class="timeline-heading">Report modal et mobilités durables</div>
+        <div class="timeline-text">
+          Face aux enjeux climatiques, le train retrouve un rôle central dans les politiques de mobilité.
+          La Région Grand Est investit dans la modernisation des TER, l'électrification des lignes (notamment celle entre Mulhouse et Paris-Est) et
+          l'amélioration de l'intermodalité dans les grandes gares. L'expérimentation de trains à hydrogène,
+          le développement du vélo en gare et les nouvelles pratiques post-COVID dessinent un paysage ferroviaire
+          en profonde mutation vers plus de durabilité et de multimodalité.
+        </div>
+      </div>
+    </div>
+    
+    <!-- Chiffres clés en damier -->
+    <div>
+      <div class="key-figures">
+        <div class="key-fig-row">
+          <div class="key-fig-card">
+            <div class="key-fig-number">1839</div>
+            <div class="key-fig-label">C'est l'année de la première ligne de chemin de fer de la région, entre Mulhouse et Thann</div>
+          </div>
+        </div>
+        <div class="key-fig-row">
+          <div class="key-fig-card">
+            <div class="key-fig-number">2007</div>
+            <div class="key-fig-label">L'année de la mise en service de la dernière ligne de la région : la LGV Est-Européenne</div>
+          </div>
+        </div>
+        <div class="key-fig-row">
+          <div class="key-fig-card">
+            <div class="key-fig-number">336</div>
+            <div class="key-fig-label">C'est le nombre de gares de voyageurs ouvertes en 2024 dans le Grand Est</div>
+          </div>
+        </div>
+        <div class="key-fig-row">
+          <div class="key-fig-card">
+            <div class="key-fig-number">~ +30%</div>
+            <div class="key-fig-label">D'évolution de fréquentation sur l'ensemble de la Région entre 2015 et 2024</div>
+          </div>
+        </div>
+        <div class="key-fig-row">
+          <div class="key-fig-card">
+            <div class="key-fig-number">123,9 M</div>
+            <div class="key-fig-label">Le nombre de voyageurs toutes gares confondues de l'ensemble de la Région en 2024</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+      <!-- Rail SVG -->
+  <div class="hero-rail">
+    <svg viewBox="0 0 1200 38" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="0" y="7"  width="1200" height="5" fill="#d4a843"/>
+      <rect x="0" y="26" width="1200" height="5" fill="#d4a843"/>
+      <g fill="#b8a080">
+        <rect x="18"  y="4" width="14" height="30" rx="1"/>
+        <rect x="63"  y="4" width="14" height="30" rx="1"/>
+        <rect x="108" y="4" width="14" height="30" rx="1"/>
+        <rect x="153" y="4" width="14" height="30" rx="1"/>
+        <rect x="198" y="4" width="14" height="30" rx="1"/>
+        <rect x="243" y="4" width="14" height="30" rx="1"/>
+        <rect x="288" y="4" width="14" height="30" rx="1"/>
+        <rect x="333" y="4" width="14" height="30" rx="1"/>
+        <rect x="378" y="4" width="14" height="30" rx="1"/>
+        <rect x="423" y="4" width="14" height="30" rx="1"/>
+        <rect x="468" y="4" width="14" height="30" rx="1"/>
+        <rect x="513" y="4" width="14" height="30" rx="1"/>
+        <rect x="558" y="4" width="14" height="30" rx="1"/>
+        <rect x="603" y="4" width="14" height="30" rx="1"/>
+        <rect x="648" y="4" width="14" height="30" rx="1"/>
+        <rect x="693" y="4" width="14" height="30" rx="1"/>
+        <rect x="738" y="4" width="14" height="30" rx="1"/>
+        <rect x="783" y="4" width="14" height="30" rx="1"/>
+        <rect x="828" y="4" width="14" height="30" rx="1"/>
+        <rect x="873" y="4" width="14" height="30" rx="1"/>
+        <rect x="918" y="4" width="14" height="30" rx="1"/>
+        <rect x="963" y="4" width="14" height="30" rx="1"/>
+        <rect x="1008" y="4" width="14" height="30" rx="1"/>
+        <rect x="1053" y="4" width="14" height="30" rx="1"/>
+        <rect x="1098" y="4" width="14" height="30" rx="1"/>
+        <rect x="1143" y="4" width="14" height="30" rx="1"/>
+      </g>
+    </svg>
+  </div>
+</section>
+
+<!-- INFOGRAPHIE -->
+<section id="infographie">
+  <div class="section-header fade-up">
+    <div class="section-num">02</div>
+    <h2 class="section-title">Infographie — Les gares du Grand Est</h2>
+    <div class="section-line"></div>
+  </div>
+
+  <p class="infog-intro fade-up">Cette infographie permet d'explorer la fréquentation des gares de voyageurs actives en 2024 sur l'ensemble du Grand Est. Elle réunit le nombre total de voyageurs sur la dernière année recensée, l'évolution annuelle dans la période 2015-2024 par département, ainsi que les gares les plus anciennes et récentes de la Région. Pour cela, des données issues d'une base de données SNCF et des recherches annexes ont été traitées pour aboutir au projet.</p>
+
+  <!-- Top 10 fréquentation -->
+  <div class="chart-container fade-up">
+    <div class="chart-top-row">
+      <div class="chart-title" id="top10-title">Top 10 — Gares les plus fréquentées (2024)</div>
+      <div class="toggle-group" id="tg-freq">
+        <button class="toggle-btn active" onclick="setTop10('high')">Les plus fréquentées</button>
+        <button class="toggle-btn" onclick="setTop10('low')">Les moins fréquentées</button>
+      </div>
+    </div>
+    <div id="top10-bars"></div>
+  </div>
+
+  <!-- Graphique évolution par département (données CSV réelles) -->
+  <div class="evol-wrapper fade-up">
+    <div class="evol-header">
+      <div class="evol-title">Évolution annuelle de la fréquentation 2015–2024 (en %)</div>
+      <select class="dept-select" id="dept-select" onchange="updateChart()">
+        <option value="all">Tous les départements</option>
+        <option value="Ardennes">Ardennes</option>
+        <option value="Aube">Aube</option>
+        <option value="Marne">Marne</option>
+        <option value="Haute-Marne">Haute-Marne</option>
+        <option value="Meurthe-et-Moselle">Meurthe-et-Moselle</option>
+        <option value="Meuse">Meuse</option>
+        <option value="Moselle">Moselle</option>
+        <option value="Bas-Rhin">Bas-Rhin</option>
+        <option value="Haut-Rhin">Haut-Rhin</option>
+        <option value="Vosges">Vosges</option>
+      </select>
+    </div>
+    <canvas id="chart-canvas"></canvas>
+    <div class="covid-annotation">
+      <div style="font-size:1.15rem;flex-shrink:0;margin-top:0.05rem;">⚠</div>
+      <div class="covid-text">
+        <strong>Chute brutale en 2019–2020 (COVID-19)</strong> — La pandémie provoque une baisse de fréquentation
+        comprise entre −18 % (Meuse) et −36 % (Haute-Marne, Moselle) selon les départements. Le rebond s'amorce
+        dès 2021–2022 et la fréquentation dépasse dans la plupart des territoires le niveau pré-crise en 2023–2024.
+      </div>
+    </div>
+  </div>
+
+  <!-- Top 10 ancienneté en 2 colonnes -->
+  <div class="anciennete-wrapper fade-up">
+    <div class="anciennete-header">
+      <div class="anc-title" id="anc-title">Gares les plus anciennes du Grand Est</div>
+      <div class="toggle-group" id="tg-anc">
+        <button class="toggle-btn active" onclick="setAnciennete('old')">Les plus anciennes</button>
+        <button class="toggle-btn" onclick="setAnciennete('recent')">Les plus récentes</button>
+      </div>
+    </div>
+    <div class="anc-cols">
+      <ul class="anc-list" id="anc-col1"></ul>
+      <ul class="anc-list" id="anc-col2"></ul>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  Le Rail en Grand Est &nbsp;·&nbsp; Projet de datavisualisation pour le compte de l'Université de Strasbourg
+  &nbsp;·&nbsp; Données SNCF en Open Data &nbsp;·&nbsp; Spadi Loïc - 2026
+</footer>
+
+<script>
+/* ══════ DONNÉES ══════ */
+
+/* Top 10 — REMPLACER par les valeurs de votre shapefile gares */
+const dataTop = {
+  high: [
+    { name: 'Strasbourg-Ville',     value: 24568668, display: '24,57 M voy.' },
+    { name: 'Metz-Ville',           value:  9515104, display: '9,52 M voy.'  },
+    { name: 'Nancy',                value:  9213438, display: '9,21 M voy.'  },
+    { name: 'Mulhouse-Ville',       value:  5702065, display: '5,70 M voy.'  },
+    { name: 'Reims',                value:  5003397, display: '5,00 M voy.'  },
+    { name: 'Colmar',               value:  4974388, display: '4,97 M voy.'  },
+    { name: 'Thionville',           value:  3769292, display: '3,77 M voy.'  },
+    { name: 'Sélestat',             value:  2807837, display: '2,81 M voy.'  },
+    { name: 'Haguenau',             value:  2173819, display: '2,17 M voy.'  },
+    { name: 'Molsheim',             value:  1826333, display: '1,83 M voy.'  },
+  ],
+  low: [
+    { name: 'Malling',              value: 30,   display: '30 voy.'  },
+    { name: 'Hatrize',              value: 350,  display: '350 voy.'  },
+    { name: 'Koenigsmacker',        value: 753,  display: '753 voy.'  },
+    { name: 'Thiaville-sur-Meurthe', value: 753, display: '753 voy.'  },
+    { name: 'Basse-Ham',            value: 890,  display: '890 voy.'  },
+    { name: 'Nançois - Tronville',  value: 1216, display: '1 216 voy.'  },
+    { name: 'Apach',                value: 1590, display: '1 590 voy.'  },
+    { name: 'Chenevières',          value: 1593, display: '1 593 voy.'  },
+    { name: 'Teting-sur-Nied',      value: 1774, display: '1 774 voy.'  },
+    { name: 'Saint-Michel-sur-Meurthe', value: 1820, display: '1 820 voy.'  },
+  ]
+};
+
+/* CSV réel — taux d'évolution annuels par département */
+const deptData = {
+  'Ardennes':           [-5.48, -1.56, -11.12,  3.59, -18.84, 21.99, 24.25, 20.35,  0.93],
+  'Aube':               [-3.79,  3.79,  -5.17,  7.53, -31.69, 23.41, 29.81, 20.28,  8.70],
+  'Marne':              [-3.63,  5.43,  -8.33,  8.50, -33.90, 22.84, 37.27, 18.80,  2.53],
+  'Haute-Marne':        [-7.47, -0.81, -13.76,  4.52, -36.09, 22.47, 31.50, 16.14, 11.24],
+  'Meurthe-et-Moselle': [-3.94,  3.34,  -2.97,  6.59, -33.93, 21.17, 29.31, 12.58,  0.60],
+  'Meuse':              [-4.60,  6.91,  -6.04,  8.94, -27.02, 22.14, 26.72, 18.20, -7.93],
+  'Moselle':            [-1.13,  4.64,  -5.75,  7.00, -36.18, 26.22, 35.35, 10.90,  2.68],
+  'Bas-Rhin':           [ 0.64,  5.69,  -0.09,  6.22, -34.02, 21.65, 27.80,  9.60,  4.04],
+  'Haut-Rhin':          [-0.94,  5.09,  -1.37,  6.36, -33.66, 16.00, 24.48, 16.68,  4.08],
+  'Vosges':             [-5.49,  1.77,  -8.09,  9.84, -27.45, 27.09, 36.46,  8.45, -5.83],
+};
+
+/* Transitions : de 2015 à 2024, on a 9 intervalles */
+const transLabels = ['2015→16','2016→17','2017→18','2018→19','2019→20','2020→21','2021→22','2022→23','2023→24'];
+const xLabels     = ['2015','2016','2017','2018','2019','2020','2021','2022','2023','2024'];
+
+const deptColors = {
+  'Ardennes':           '#e74c3c',
+  'Aube':               '#e67e22',
+  'Marne':              '#f1c40f',
+  'Haute-Marne':        '#2ecc71',
+  'Meurthe-et-Moselle': '#1abc9c',
+  'Meuse':              '#3498db',
+  'Moselle':            '#9b59b6',
+  'Bas-Rhin':           '#d4a843',
+  'Haut-Rhin':          '#e84393',
+  'Vosges':             '#00cec9',
+};
+
+/* Ancienneté — REMPLACER par vos vraies données shapefile */
+const dataAnc = {
+  old: [
+    { name: 'Cernay',            year: 1839 },
+    { name: 'Mulhouse-Ville',    year: 1839 },
+    { name: 'Thann',             year: 1839 },
+    { name: 'Bartenheim',        year: 1840 },
+    { name: 'Benfeld',           year: 1840 },
+    { name: 'Colmar',            year: 1840 },
+    { name: 'Ebersheim',         year: 1840 },
+    { name: 'Habsheim',          year: 1840 },
+    { name: 'Kogenheim',         year: 1840 },
+    { name: 'Rixheim',           year: 1840 },
+  ],
+  recent: [
+    { name: 'Ranspach',              year: 2010 },
+    { name: 'Thann-Centre',          year: 2010 },
+    { name: 'Thann Saint-Jacques',   year: 2010 },
+    { name: 'Vieux-Thann ZI',        year: 2010 },
+    { name: "Franchet d'Esperey",    year: 2009 },
+    { name: 'Colmar Saint-Joseph',   year: 2008 },
+    { name: 'Champagne-Ardenne TGV', year: 2007 },
+    { name: 'Lorraine TGV',          year: 2007 },
+    { name: 'Meuse TGV',             year: 2007 },
+    { name: 'Saint-Gilles Lycée',    year: 2007 },
+  ]
+};
+
+/* ══════ GRAPHIQUE CANVAS ══════ */
+const canvas = document.getElementById('chart-canvas');
+const ctx    = canvas.getContext('2d');
+
+function resizeCanvas() {
+  const dpr  = window.devicePixelRatio || 1;
+  const W    = canvas.parentElement.getBoundingClientRect().width;
+  canvas.width  = W * dpr;
+  canvas.height = 320 * dpr;
+  canvas.style.width  = W + 'px';
+  canvas.style.height = '320px';
+  ctx.scale(dpr, dpr);
+}
+
+function drawChart(selectedDept) {
+  resizeCanvas();
+  const W   = canvas.offsetWidth;
+  const H   = 320;
+  const PAD = { top: 36, right: 30, bottom: 52, left: 60 };
+  const PW  = W - PAD.left - PAD.right;
+  const PH  = H - PAD.top  - PAD.bottom;
+  const N   = transLabels.length; /* 9 intervalles */
+
+  ctx.clearRect(0, 0, W, H);
+
+  /* Séries à afficher */
+  let series = selectedDept === 'all'
+    ? Object.keys(deptData).map(k => ({ name: k, data: deptData[k], color: deptColors[k] }))
+    : [{ name: selectedDept, data: deptData[selectedDept], color: deptColors[selectedDept] }];
+
+  /* Y bounds */
+  const allVals = series.flatMap(s => s.data);
+  const rawMin  = Math.min(...allVals);
+  const rawMax  = Math.max(...allVals);
+  const margin  = (rawMax - rawMin) * 0.14;
+  const yMin    = Math.floor(rawMin - margin);
+  const yMax    = Math.ceil(rawMax  + margin);
+  const yRange  = yMax - yMin;
+
+  /* Les X sont les 9 intervalles mais affichés aux positions 0..9 */
+  const xPos = i => PAD.left + (i / (N - 1)) * PW;
+  const yPos = v => PAD.top  + PH - ((v - yMin) / yRange) * PH;
+  const zeroY = yPos(0);
+
+  /* Grille */
+  const nTicks = 6;
+  for (let i = 0; i <= nTicks; i++) {
+    const val = yMin + (yRange / nTicks) * i;
+    const y   = yPos(val);
+    ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+    ctx.lineWidth   = 1;
+    ctx.setLineDash([]);
+    ctx.beginPath(); ctx.moveTo(PAD.left, y); ctx.lineTo(W - PAD.right, y); ctx.stroke();
+    ctx.fillStyle = 'rgba(184,176,160,0.6)';
+    ctx.font = '12px "Barlow Condensed", sans-serif';
+    ctx.textAlign = 'right';
+    ctx.fillText(val.toFixed(0) + '%', PAD.left - 6, y + 4);
+  }
+
+  /* Axe zéro */
+  ctx.strokeStyle = 'rgba(212,168,67,0.4)';
+  ctx.lineWidth   = 1;
+  ctx.setLineDash([5, 4]);
+  ctx.beginPath(); ctx.moveTo(PAD.left, zeroY); ctx.lineTo(W - PAD.right, zeroY); ctx.stroke();
+  ctx.setLineDash([]);
+
+  /* Zone COVID (index 4 = intervalle 2019→20) */
+  const x4 = xPos(4) - (PW / (N - 1)) / 2;
+  const x5 = xPos(4) + (PW / (N - 1)) / 2;
+  ctx.fillStyle = 'rgba(192,57,43,0.12)';
+  ctx.fillRect(x4, PAD.top, x5 - x4, PH);
+  ctx.fillStyle = 'rgba(231,76,60,0.8)';
+  ctx.font = 'bold 11px "Barlow Condensed", sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('COVID', (x4 + x5) / 2, PAD.top + 14);
+
+  /* Courbes */
+  const isSingle = selectedDept !== 'all';
+  series.forEach(s => {
+    const alpha = isSingle ? 1 : 0.55;
+    ctx.globalAlpha = alpha;
+
+    /* Aire */
+    ctx.beginPath();
+    ctx.moveTo(xPos(0), zeroY);
+    s.data.forEach((v, i) => ctx.lineTo(xPos(i), yPos(v)));
+    ctx.lineTo(xPos(N - 1), zeroY);
+    ctx.closePath();
+    ctx.fillStyle = s.color + '22';
+    ctx.fill();
+
+    /* Ligne */
+    ctx.beginPath();
+    s.data.forEach((v, i) => i === 0 ? ctx.moveTo(xPos(i), yPos(v)) : ctx.lineTo(xPos(i), yPos(v)));
+    ctx.strokeStyle = s.color;
+    ctx.lineWidth   = isSingle ? 2.5 : 1.5;
+    ctx.lineJoin    = 'round';
+    ctx.stroke();
+
+    /* Points */
+    s.data.forEach((v, i) => {
+      const isCovid = (i === 4);
+      ctx.beginPath();
+      ctx.arc(xPos(i), yPos(v), isSingle ? 4.5 : 3, 0, Math.PI * 2);
+      ctx.fillStyle   = isCovid ? '#e74c3c' : s.color;
+      ctx.strokeStyle = 'rgba(28,26,24,0.7)';
+      ctx.lineWidth   = isSingle ? 1.5 : 0.8;
+      ctx.globalAlpha = alpha;
+      ctx.fill(); ctx.stroke();
+
+      if (isSingle) {
+        ctx.globalAlpha = 1;
+        ctx.fillStyle   = isCovid ? '#e74c3c' : 'rgba(232,223,200,0.9)';
+        ctx.font        = '12px "Barlow Condensed", sans-serif';
+        ctx.textAlign   = 'center';
+        const dy = v >= 0 ? -12 : 16;
+        ctx.fillText(v.toFixed(1) + '%', xPos(i), yPos(v) + dy);
+      }
+    });
+    ctx.globalAlpha = 1;
+  });
+
+  /* Légende mode "all" */
+  if (!isSingle) {
+    let lx = PAD.left, ly = H - 5;
+    ctx.font = '11px "Barlow Condensed", sans-serif';
+    series.forEach(s => {
+      const tw = ctx.measureText(s.name).width + 20;
+      if (lx + tw > W - PAD.right) { lx = PAD.left; ly -= 16; }
+      ctx.beginPath();
+      ctx.arc(lx + 5, ly - 4, 4, 0, Math.PI * 2);
+      ctx.fillStyle = s.color; ctx.fill();
+      ctx.fillStyle = 'rgba(184,176,160,0.85)';
+      ctx.textAlign = 'left';
+      ctx.fillText(s.name, lx + 13, ly);
+      lx += tw + 6;
+    });
+  }
+
+  /* Labels axe X */
+  ctx.fillStyle = 'rgba(184,176,160,0.6)';
+  ctx.font      = '12px "Barlow Condensed", sans-serif';
+  ctx.textAlign = 'center';
+  /* On affiche les 9 intervalles centrés sur leurs positions + l'étiquette finale */
+  xLabels.forEach((yr, i) => {
+    if (i < N) ctx.fillText(yr, xPos(i), H - PAD.bottom + 20);
+  });
+  ctx.fillText(xLabels[N], xPos(N - 1) + (PW / (N - 1)), H - PAD.bottom + 20);
+}
+
+function updateChart() {
+  drawChart(document.getElementById('dept-select').value);
+}
+
+/* ══════ TOP 10 ══════ */
+function renderTop10(key) {
+  const data = dataTop[key];
+  const max  = data[0].value;
+  const cls  = key === 'high' ? 'bar-fill-top' : 'bar-fill-bottom';
+  document.getElementById('top10-bars').innerHTML = data.map((d, i) => `
+    <div class="bar-row">
+      <span class="bar-rank">#${i + 1}</span>
+      <span class="bar-label" title="${d.name}">${d.name}</span>
+      <div class="bar-track">
+        <div class="bar-fill ${cls}" style="width:${(d.value / max * 100).toFixed(1)}%"></div>
+      </div>
+      <span class="bar-value">${d.display}</span>
+    </div>`).join('');
+  document.getElementById('top10-title').textContent =
+    key === 'high'
+      ? 'Top 10 — Gares les plus fréquentées (2024)'
+      : 'Top 10 — Gares les moins fréquentées (2024)';
+}
+function setTop10(key) {
+  document.getElementById('tg-freq').querySelectorAll('.toggle-btn').forEach((b, i) => {
+    b.classList.toggle('active', (key==='high'&&i===0)||(key==='low'&&i===1));
+  });
+  renderTop10(key);
+}
+
+/* ══════ ANCIENNETÉ ══════ */
+function renderAnciennete(key) {
+  const data  = dataAnc[key];
+  const color = key === 'old' ? '#d4a843' : '#2874a6';
+
+  function makeItem(d, rank) {
+    return `<li class="anc-item" id="anc-${rank}">
+      <span class="anc-num">${rank}.</span>
+      <span class="anc-name">${d.name}</span>
+      <span class="anc-year" style="color:${color};">(${d.year})</span>
+    </li>`;
+  }
+
+  document.getElementById('anc-col1').innerHTML = data.slice(0, 5).map((d, i) => makeItem(d, i + 1)).join('');
+  document.getElementById('anc-col2').innerHTML = data.slice(5, 10).map((d, i) => makeItem(d, i + 6)).join('');
+
+  document.getElementById('anc-title').textContent =
+    key === 'old' ? 'Gares les plus anciennes du Grand Est' : 'Gares les plus récentes du Grand Est';
+
+  data.forEach((_, i) => {
+    setTimeout(() => {
+      const el = document.getElementById(`anc-${i + 1}`);
+      if (el) el.classList.add('visible');
+    }, i * 65);
+  });
+}
+function setAnciennete(key) {
+  document.getElementById('tg-anc').querySelectorAll('.toggle-btn').forEach((b, i) => {
+    b.classList.toggle('active', (key==='old'&&i===0)||(key==='recent'&&i===1));
+  });
+  renderAnciennete(key);
+}
+
+/* ══════ SCROLL ANIMATIONS ══════ */
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); }
+  });
+}, { threshold: 0.1 });
+document.querySelectorAll('.fade-up, .timeline-item').forEach(el => observer.observe(el));
+
+/* ══════ INIT ══════ */
+renderTop10('high');
+renderAnciennete('old');
+drawChart('all');
+window.addEventListener('resize', updateChart);
+</script>
+</body>
+</html>

@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Grand Est Ferroviaire — Datavisualisation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;600;700;900&family=Barlow:wght@300;400;500&family=Barlow+Semi+Condensed:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --noir:       #0f0e0d;
+      --charbon:    #1c1a18;
+      --acier:      #2e2b27;
+      --rouge:      #c0392b;
+      --or:         #d4a843;
+      --sable:      #e8dfc8;
+      --creme:      #f5f0e8;
+      --blanc:      #fafaf8;
+      --gris:       #8a8478;
+      --gris-clair: #b8b0a0;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--charbon);
+      color: var(--creme);
+      font-family: 'Barlow', sans-serif;
+      font-weight: 300;
+      line-height: 1.75;
+      overflow-x: hidden;
+      font-size: 17px;
+    }
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: repeating-linear-gradient(90deg, transparent, transparent 59px, rgba(255,255,255,0.012) 59px, rgba(255,255,255,0.012) 60px);
+      pointer-events: none; z-index: 0;
+    }
+
+    /* ─── NAV ─── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      background: rgba(15,14,13,0.93);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(212,168,67,0.2);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 3.5rem; height: 62px;
+    }
+    .nav-logo {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700; font-size: 1.4rem;
+      letter-spacing: 0.12em; text-transform: uppercase; color: var(--or);
+    }
+    .nav-logo span { color: var(--gris-clair); font-weight: 300; }
+    .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+    .nav-links a {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 400; font-size: 1.1rem;
+      letter-spacing: 0.15em; text-transform: uppercase;
+      color: var(--gris-clair); text-decoration: none;
+      transition: color 0.2s; position: relative;
+    }
+    .nav-links a.active, .nav-links a:hover { color: var(--or); }
+    .nav-links a.active::after {
+      content: ''; position: absolute;
+      bottom: -4px; left: 0; right: 0;
+      height: 1px; background: var(--or);
+    }
+
+    /* ─── HERO ─── */
+    .hero {
+      position: relative; min-height: 100vh;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 80px 3rem 5rem; overflow: hidden; text-align: center;
+    }
+    .hero-bg {
+      position: absolute; inset: 0;
+      background:
+        linear-gradient(180deg, rgba(15,14,13,0.3) 0%, rgba(15,14,13,0.72) 65%, rgba(15,14,13,0.97) 100%),
+        url('site_images/background_image.png') center/cover no-repeat;
+    }
+
+    /* Cadre doré angles */
+    .hero-frame {
+      position: relative;
+      display: inline-block;
+      padding: 2.8rem 4rem 2.4rem;
+      margin-bottom: 2rem;
+    }
+    .hero-frame::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 40px; height: 40px;
+      border-top: 2px solid var(--or);
+      border-left: 2px solid var(--or);
+    }
+    .hero-frame::after {
+      content: '';
+      position: absolute;
+      bottom: 0; right: 0;
+      width: 40px; height: 40px;
+      border-bottom: 2px solid var(--or);
+      border-right: 2px solid var(--or);
+    }
+
+    .hero-title {
+      position: relative;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900;
+      font-size: clamp(3.8rem, 9vw, 7.5rem);
+      line-height: 0.92;
+      text-transform: uppercase;
+      letter-spacing: -0.01em;
+      color: var(--blanc);
+    }
+    .hero-title em { font-style: normal; color: var(--or); }
+
+    .hero-separator {
+      position: relative;
+      width: 90px; height: 1px;
+      background: rgba(212,168,67,0.5);
+      margin: 0 auto 1.8rem;
+    }
+
+    .hero-tag { position: relative; }
+    .hero-tag-sub {
+      font-family: 'Barlow', sans-serif;
+      font-size: 1.08rem; font-weight: 300;
+      color: var(--gris-clair); line-height: 1.6;
+      margin-bottom: 0.45rem; font-style: italic;
+    }
+    .hero-tag-author {
+      font-family: 'Barlow Semi Condensed', sans-serif;
+      font-size: 0.95rem; font-weight: 500;
+      color: var(--sable); letter-spacing: 0.06em; margin-bottom: 0.25rem;
+    }
+
+    /* Rail SVG décoratif */
+    .hero-rail {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      height: 38px; overflow: hidden; opacity: 0.32;
+    }
+
+    /* ─── SECTIONS ─── */
+    section { position: relative; z-index: 1; padding: 5.5rem 3.5rem; }
+
+    .section-header {
+      display: flex; align-items: baseline; gap: 1.5rem; margin-bottom: 4rem;
+    }
+    .section-num {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900; font-size: 4.5rem;
+      color: rgba(212,168,67,0.4); line-height: 1; flex-shrink: 0;
+    }
+    .section-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700; font-size: 2rem;
+      text-transform: uppercase; letter-spacing: 0.08em; color: var(--sable);
+    }
+    .section-line {
+      flex: 1; height: 1px;
+      background: linear-gradient(to right, rgba(212,168,67,0.4), transparent);
+      margin-left: 1rem;
+    }
+
+    /* ─── SECTION DATAVIZ ─── */
+    #dataviz-1 {
+      background-image: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)),
+        url('site_images/background_dataviz1.jpg');
+      background-attachment: fixed;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: cover;
+    }
+
+    #dataviz-2 {
+      background-image: linear-gradient(rgba(0,0,0,0.75), rgba(0,0,0,0.75)),
+        url('site_images/background_dataviz2.jpg');
+      background-attachment: fixed;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: cover;
+    }
+
+    #dataviz-3 {
+      background-image: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)),
+        url('site_images/background_dataviz3.jpg');
+      background-attachment: fixed;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: cover;
+    }
+
+    /* ─── CARTE DATAVIZ ─── */
+    .dataviz-card {
+      background: var(--acier);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .dataviz-card-header {
+      padding: 1.8rem 2.2rem 1.4rem;
+      border-bottom: 1px solid rgba(212,168,67,0.12);
+    }
+
+    .dataviz-card-label {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 600; font-size: 0.72rem;
+      letter-spacing: 0.28em; text-transform: uppercase;
+      color: var(--or); margin-bottom: 0.5rem;
+      display: flex; align-items: center; gap: 0.8rem;
+    }
+    .dataviz-card-label::before {
+      content: '';
+      display: inline-block;
+      width: 24px; height: 1px;
+      background: var(--or);
+    }
+
+    .dataviz-card-title {
+      font-family: 'Barlow Semi Condensed', sans-serif;
+      font-weight: 600; font-size: 1.3rem;
+      color: var(--blanc); line-height: 1.3;
+      margin-bottom: 0.6rem;
+    }
+
+    .dataviz-card-desc {
+      font-size: 0.97rem; color: var(--gris-clair);
+      line-height: 1.7; max-width: 720px;
+    }
+
+    .dataviz-embed {
+      padding: 0;
+      background: var(--noir);
+    }
+
+    /* Forcer Flourish à prendre toute la largeur */
+    .dataviz-embed .flourish-embed {
+      width: 100% !important;
+      display: block;
+    }
+
+    /* ─── INTRO SECTION ─── */
+    .section-intro {
+      font-size: 1.05rem; color: var(--gris-clair);
+      max-width: 780px; margin-bottom: 3.5rem; line-height: 1.8;
+    }
+
+    /* ─── NOTE MÉTHODOLOGIQUE ─── */
+    .methodo-note {
+      display: flex; align-items: flex-start; gap: 1rem;
+      padding: 1.1rem 1.4rem;
+      background: rgba(212,168,67,0.06);
+      border-left: 2px solid var(--or);
+      border-radius: 1px;
+      margin-top: 2.8rem;
+    }
+    .methodo-icon {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700; font-size: 0.72rem;
+      letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--or); flex-shrink: 0; margin-top: 0.1rem;
+      white-space: nowrap;
+    }
+    .methodo-text {
+      font-size: 0.95rem; color: var(--gris-clair); line-height: 1.65;
+    }
+
+    /* ─── ANIMATIONS ─── */
+    .fade-up {
+      opacity: 0; transform: translateY(24px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .fade-up.visible { opacity: 1; transform: translateY(0); }
+
+    /* ─── FOOTER ─── */
+    footer {
+      background: var(--noir);
+      border-top: 1px solid rgba(212,168,67,0.15);
+      padding: 2.2rem 3.5rem; text-align: center;
+      font-size: 0.85rem; color: var(--gris); letter-spacing: 0.06em;
+    }
+
+    @media (max-width: 960px) {
+      nav { padding: 0 1.5rem; }
+      section { padding: 3.5rem 1.5rem; }
+      .hero { padding: 80px 1.5rem 3rem; }
+      .hero-frame { padding: 2rem 2rem 1.8rem; }
+      .dataviz-card-header { padding: 1.4rem 1.5rem 1.2rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">Le rail en Grand Est</div>
+  <ul class="nav-links">
+    <li><a href="accueil-contexte-infographie.html">Contexte</a></li>
+    <li><a href="datavisualisation.html" class="active">Dataviz</a></li>
+    <li><a href="geovisualisation.html">Carte</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="hero-bg"></div>
+
+  <div class="hero-frame">
+    <h1 class="hero-title">Data<br><em>Visualisation</em></h1>
+  </div>
+
+  <div class="hero-separator"></div>
+
+  <div class="hero-tag">
+    <p class="hero-tag-sub">Fréquentation, réseau et dynamiques du rail en Grand Est</p>
+    <p class="hero-tag-author">Loïc Spadi &mdash; Master 1 Observation de la Terre et Géomatique</p>
+    <p class="hero-tag-author">Faculté de Géographie et d'Aménagement - Université de Strasbourg</p>
+  </div>
+
+  <!-- Rail SVG -->
+  <div class="hero-rail">
+    <svg viewBox="0 0 1200 38" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="0" y="7"  width="1200" height="5" fill="#d4a843"/>
+      <rect x="0" y="26" width="1200" height="5" fill="#d4a843"/>
+      <g fill="#b8a080">
+        <rect x="18"  y="4" width="14" height="30" rx="1"/>
+        <rect x="63"  y="4" width="14" height="30" rx="1"/>
+        <rect x="108" y="4" width="14" height="30" rx="1"/>
+        <rect x="153" y="4" width="14" height="30" rx="1"/>
+        <rect x="198" y="4" width="14" height="30" rx="1"/>
+        <rect x="243" y="4" width="14" height="30" rx="1"/>
+        <rect x="288" y="4" width="14" height="30" rx="1"/>
+        <rect x="333" y="4" width="14" height="30" rx="1"/>
+        <rect x="378" y="4" width="14" height="30" rx="1"/>
+        <rect x="423" y="4" width="14" height="30" rx="1"/>
+        <rect x="468" y="4" width="14" height="30" rx="1"/>
+        <rect x="513" y="4" width="14" height="30" rx="1"/>
+        <rect x="558" y="4" width="14" height="30" rx="1"/>
+        <rect x="603" y="4" width="14" height="30" rx="1"/>
+        <rect x="648" y="4" width="14" height="30" rx="1"/>
+        <rect x="693" y="4" width="14" height="30" rx="1"/>
+        <rect x="738" y="4" width="14" height="30" rx="1"/>
+        <rect x="783" y="4" width="14" height="30" rx="1"/>
+        <rect x="828" y="4" width="14" height="30" rx="1"/>
+        <rect x="873" y="4" width="14" height="30" rx="1"/>
+        <rect x="918" y="4" width="14" height="30" rx="1"/>
+        <rect x="963" y="4" width="14" height="30" rx="1"/>
+        <rect x="1008" y="4" width="14" height="30" rx="1"/>
+        <rect x="1053" y="4" width="14" height="30" rx="1"/>
+        <rect x="1098" y="4" width="14" height="30" rx="1"/>
+        <rect x="1143" y="4" width="14" height="30" rx="1"/>
+      </g>
+    </svg>
+  </div>
+</header>
+
+<!-- ══════════════════════════════════════
+     SECTION 1 — FRÉQUENTATION PAR DÉPARTEMENT
+══════════════════════════════════════ -->
+<section id="dataviz-1">
+  <div class="section-header fade-up">
+    <div class="section-num">01</div>
+    <h2 class="section-title">Fréquentation par département</h2>
+    <div class="section-line"></div>
+  </div>
+
+  <p class="section-intro fade-up">
+    L'évolution de la fréquentation des gares, agrégée par département, révèle des dynamiques
+    contrastées entre territoires urbains denses et espaces ruraux. La crise sanitaire de 2020
+    constitue une rupture nette dans toutes les séries, suivie d'un rebond inégal selon les territoires.
+  </p>
+
+  <div class="dataviz-card fade-up">
+    <div class="dataviz-card-header">
+      <div class="dataviz-card-label">Visualisation interactive · Flourish</div>
+      <div class="dataviz-card-title">Évolution de la fréquentation des gares par département par années dans le Grand Est</div>
+      <p class="dataviz-card-desc">
+        Comparaison de la fréquentation annuelle (en nombre de voyageurs) pour chaque département
+        du Grand Est entre 2015 et 2024. Survolez les courbes pour afficher les valeurs détaillées.
+        Les données sont issues des fichiers ouverts SNCF et du traitement SIG réalisé pour ce projet.
+      </p>
+    </div>
+    <div class="dataviz-embed">
+      <div class="flourish-embed flourish-chart" data-src="visualisation/28413482">
+        <script src="https://public.flourish.studio/resources/embed.js"></script>
+        <noscript><img src="https://public.flourish.studio/visualisation/28413482/thumbnail" width="100%" alt="visualization" /></noscript>
+      </div>
+    </div>
+  </div>
+
+  <div class="methodo-note fade-up">
+    <div class="methodo-icon">Source</div>
+    <div class="methodo-text">
+      Données SNCF Open Data — fréquentation annuelle des gares, agrégées par département.
+      Les valeurs correspondent au nombre total de voyageurs montants et descendants enregistrés
+      dans les gares du périmètre Grand Est entre 2015 et 2024.
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     SECTION 2 — RÉSEAU : GARES ET LIGNES
+══════════════════════════════════════ -->
+<section id="dataviz-2">
+  <div class="section-header fade-up">
+    <div class="section-num">02</div>
+    <h2 class="section-title">Réseau : gares et lignes par département</h2>
+    <div class="section-line"></div>
+  </div>
+
+  <p class="section-intro fade-up">
+    La répartition des gares et la longueur des lignes ferroviaires varient fortement d'un département
+    à l'autre, reflétant l'histoire industrielle, la densité de population et les politiques d'aménagement
+    successives. Le Bas-Rhin et la Moselle concentrent l'essentiel du réseau régional.
+  </p>
+
+  <div class="dataviz-card fade-up">
+    <div class="dataviz-card-header">
+      <div class="dataviz-card-label">Visualisation interactive · Flourish</div>
+      <div class="dataviz-card-title">Nombre de gares et longueurs de lignes par département</div>
+      <p class="dataviz-card-desc">
+        Comparaison du nombre de gares actives et de la longueur totale des lignes voyageurs
+        pour chaque département du Grand Est en 2024. Ces indicateurs permettent d'évaluer
+        la densité et la couverture du réseau ferroviaire à l'échelle départementale.
+      </p>
+    </div>
+    <div class="dataviz-embed">
+      <div class="flourish-embed flourish-chart" data-src="visualisation/28413828">
+        <script src="https://public.flourish.studio/resources/embed.js"></script>
+        <noscript><img src="https://public.flourish.studio/visualisation/28413828/thumbnail" width="100%" alt="visualization" /></noscript>
+      </div>
+    </div>
+  </div>
+
+  <div class="methodo-note fade-up">
+    <div class="methodo-icon">Source</div>
+    <div class="methodo-text">
+      Données issues du traitement SIG des shapefiles lignes ferroviaires voyageurs et gares du Grand Est
+      (projection EPSG:2154). Le comptage des gares inclut uniquement les points d'arrêt actifs en 2024 ;
+      les longueurs de lignes sont calculées en km à partir des géométries vectorielles.
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     SECTION 3 — ÉVOLUTION DU NOMBRE DE GARES
+══════════════════════════════════════ -->
+<section id="dataviz-3">
+  <div class="section-header fade-up">
+    <div class="section-num">03</div>
+    <h2 class="section-title">Évolution du nombre de gares</h2>
+    <div class="section-line"></div>
+  </div>
+
+  <p class="section-intro fade-up">
+    L'ouverture et la fermeture des gares constituent un marqueur historique fort des politiques
+    ferroviaires. La chronologie de l'implantation des gares en Grand Est reflète les grandes
+    phases d'expansion du réseau au XIXe siècle, puis les vagues de rationalisation du XXe siècle,
+    jusqu'aux rares créations contemporaines liées à la grande vitesse.
+  </p>
+
+  <div class="dataviz-card fade-up">
+    <div class="dataviz-card-header">
+      <div class="dataviz-card-label">Visualisation interactive · Flourish</div>
+      <div class="dataviz-card-title">Évolution du nombre de gares par année dans le Grand Est</div>
+      <p class="dataviz-card-desc">
+        Chronologie de l'ouverture des gares du Grand Est depuis les premières lignes du XIXe siècle
+        jusqu'en 2024. Cette visualisation permet de suivre les grandes phases d'expansion du réseau
+        et d'identifier les périodes d'accélération ou de ralentissement de la construction ferroviaire.
+      </p>
+    </div>
+    <div class="dataviz-embed">
+      <div class="flourish-embed flourish-chart" data-src="visualisation/28414383">
+        <script src="https://public.flourish.studio/resources/embed.js"></script>
+        <noscript><img src="https://public.flourish.studio/visualisation/28414383/thumbnail" width="100%" alt="visualization" /></noscript>
+      </div>
+    </div>
+  </div>
+
+  <div class="methodo-note fade-up">
+    <div class="methodo-icon">Source</div>
+    <div class="methodo-text">
+      Données issues du shapefile gares du Grand Est — champ date d'ouverture. Les années manquantes
+      ont été complétées par croisement avec les sources historiques disponibles (archives SNCF,
+      base de données des chemins de fer français). Seules les gares voyageurs sont comptabilisées.
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  Le Rail en Grand Est &nbsp;·&nbsp; Projet de datavisualisation pour le compte de l'Université de Strasbourg &nbsp;·&nbsp;
+  Données SNCF Open Data &nbsp;·&nbsp; Spadi Loïc - 2026
+</footer>
+
+<script>
+/* ══════ SCROLL ANIMATIONS ══════ */
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); }
+  });
+}, { threshold: 0.08 });
+document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+</script>
+
+</body>
+</html>
